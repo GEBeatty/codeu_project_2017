@@ -1,7 +1,9 @@
 package codeu.chat.util.mysql;
 
 import java.sql.*;
+import java.util.Calendar;
 import java.util.Properties;
+import java.util.Calendar;
 
 
 public class MySQLConnection{
@@ -60,5 +62,41 @@ public class MySQLConnection{
 
     public void disconnectConnection(){
         disconnect();
+    }
+
+    /*
+        ADD METHODS
+        Adds information to the database
+    */
+    public void addUser(String userName){
+        // Create connection and statement
+        Connection conn = getConnection();
+        Statement state = null;
+        
+        try{
+            // Create and execute statement
+            state = conn.createStatement();
+            state.executeUpdate("INSERT INTO Users (NAME, PASSWORD) VALUES (\""+userName+
+                "\", NULL");
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        disconnectConnection();
+    }
+
+    public void addUser(String userName, String password);
+
+    public void addConversation(String title, String owner){
+
+    }
+
+    public void addConversation(String title, String owner, String password);
+
+    public void addMessage(String owner, String body, String conversation){
+        // Fetch timestamp
+        Calendar cal = Calendar.getInstance();
+        java.util.Date date = cal.getTime();
+
     }
 }

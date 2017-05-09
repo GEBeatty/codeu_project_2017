@@ -17,6 +17,7 @@ package codeu.chat.client;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.Thread;
+import java.sql.*;
 
 import codeu.chat.common.BasicController;
 import codeu.chat.common.Conversation;
@@ -28,15 +29,19 @@ import codeu.chat.util.Serializers;
 import codeu.chat.util.Uuid;
 import codeu.chat.util.connections.Connection;
 import codeu.chat.util.connections.ConnectionSource;
+import codeu.chat.util.mysql.MySQLConnection;
 
 public class Controller implements BasicController {
 
   private final static Logger.Log LOG = Logger.newLog(Controller.class);
 
+  private final MySQLConnection mysqlConnection;
+
   private final ConnectionSource source;
 
   public Controller(ConnectionSource source) {
     this.source = source;
+    this.mysqlConnection = new MySQLConnection();
   }
 
   @Override
@@ -64,6 +69,10 @@ public class Controller implements BasicController {
     return response;
   }
 
+  /*
+    Creates a new user, making sure to clear it with the server first, before adding
+    the name to the MySQL database.
+  */
   @Override
   public User newUser(String name) {
 
@@ -75,16 +84,22 @@ public class Controller implements BasicController {
       Serializers.STRING.write(connection.out(), name);
       LOG.info("newUser: Request completed.");
 
+        // If server response works correctly
       if (Serializers.INTEGER.read(connection.in()) == NetworkCode.NEW_USER_RESPONSE) {
         response = Serializers.nullable(User.SERIALIZER).read(connection.in());
         LOG.info("newUser: Response completed.");
-      } else {
+
+        // Send name to database
+        mysqlConnection.addUser(name);
+
+      } else {  // If server response fails
         LOG.error("Response from server failed.");
       }
     } catch (Exception ex) {
       System.out.println("ERROR: Exception during call on server. Check log for details.");
       LOG.error(ex, "Exception during call on server.");
     }
+
 
     return response;
   }
