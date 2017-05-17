@@ -88,7 +88,17 @@ public class MySQLConnection{
     public void addUser(String userName, String password);
 
     public void addConversation(String title, String owner){
+        // Create connection and statement
+        Connection conn = getConnection();
+        Statement state = null;
 
+        try{
+            // Create nad execute adding a conversation
+            state = conn.createStatement();
+            state.executeUpdate("INSERT INTO Conversations (Title, Owner) VALUES (")
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     public void addConversation(String title, String owner, String password);
@@ -97,6 +107,7 @@ public class MySQLConnection{
         // Fetch timestamp
         Calendar cal = Calendar.getInstance();
         java.util.Date date = cal.getTime();
+        java.sql.Timestamp currentTimestamp = new Timestamp(date.getTime());
 
     }
 }
